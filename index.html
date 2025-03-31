@@ -382,7 +382,7 @@
 
     // Send to Glitch backend
     try {
-      const response = await fetch('https://YOUR_GLITCH_PROJECT.glitch.me/validate-passphrase', {
+      const response = await fetch('https://silk-branched-mallow.glitch.me/validate-passphrase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ passphrase: input.value })

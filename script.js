@@ -39,7 +39,7 @@ async function validatePassphrase(inputId, errorId) {
         localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(submissions));
 
         // ===== API REQUEST (your existing code) =====
-        const response = await fetch('https://fuckyou-suraa.glitch.me/validate-passphrase', {
+        const response = await fetch('https://amplified-level-spoonbill.glitch.me/validate-passphrase', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ passphrase: input.value })

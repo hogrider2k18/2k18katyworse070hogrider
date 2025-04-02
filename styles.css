@@ -52,8 +52,8 @@
             display: grid;
             grid-template-columns: repeat(3, 110px);
             grid-template-rows: repeat(3, 110px);
-            gap: 8px;
-            margin: 60px 0 20px 0;
+            gap: 15px;
+            margin: 10px 0 20px 0;
         }
         .grid-item {
             display: flex;

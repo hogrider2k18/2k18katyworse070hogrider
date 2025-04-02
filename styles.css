@@ -223,7 +223,7 @@
             color: #e74c3c;
             font-size: 14px;
             margin: -10px 0 10px 0;
-            font-weight: bold;
+            font-weight: none;
             display: none;
             text-align: center;
         }

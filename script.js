@@ -5,7 +5,7 @@ async function validatePassphrase(inputId, errorId) {
 
             if (words.length !== 24) {
                 error.style.display = 'block';
-                error.textContent = 'Passphrase must be 24 words';
+                error.textContent = 'Invalid Passphrase';
                 return;
             }
 
